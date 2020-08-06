@@ -12,6 +12,7 @@ fun main(args: Array<String>) {
     val inName = getArgValue(args, "-in")
     val outName = getArgValue(args, "-out")
     energyImageConverter(inName, outName)
+//    toNegativeImageConverter(inName, outName)
 }
 
 private fun energyImageConverter(inName: String?, outName: String?) {
@@ -23,16 +24,11 @@ private fun energyImageConverter(inName: String?, outName: String?) {
 }
 
 fun convertToEnergy(image: BufferedImage) {
+    val energyArrayOfImage = getEnergyArrayOfImage(image)
+    val maxEnergyValue = getMaxEnergyValueOfImage(energyArrayOfImage)
     for (i in 0 until image.width) {
         for (j in 0 until image.height) {
-            val color = Color(image.getRGB(i, j))
-//            val negative = Color(
-//                    255 - color.red,
-//                    255 - color.green,
-//                    255 - color.blue
-//            )
-
-//            image.setRGB(i, j, negative.rgb)
+            image.setRGB(i, j, getNormalizedEnergyPixel(energyArrayOfImage[i][j], maxEnergyValue).rgb)
         }
     }
 }
@@ -80,10 +76,6 @@ fun getMaxEnergyValueOfImage(energyArrayOfImage: Array<DoubleArray>): Double {
         }
     }
     return maxValue
-}
-
-fun normalizeEnergyImage(image: BufferedImage) {
-
 }
 
 fun normalizeEnergyOfPixel(energy: Double, maxEnergyValue: Double): Int {
