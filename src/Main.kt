@@ -8,13 +8,11 @@ import javax.imageio.ImageIO
 
 
 fun main(args: Array<String>) {
-
     val inName = getArgValue(args, "-in")
     val outName = getArgValue(args, "-out")
 
     if (inName != null && outName != null) {
-        val inPath = "/Users/metalcyborg/Downloads/images/$inName"
-        val image = createImage(inPath)
+        val image = createImage(inName)
         convertToNegative(image)
         createImageFile(image, outName)
     }
@@ -54,24 +52,24 @@ private fun createImageFile(image: BufferedImage, fileName: String) {
     ImageIO.write(image, "png", file)
 }
 
-//fun main() {
-//    val scanner = Scanner(System.`in`)
-//
-//    val (width, height) = getRectangleSize(scanner)
-//    val outputPath = getImageName(scanner)
-//
-//    val img = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-//    val graphics = img.graphics
-//
-//    graphics.color = Color.BLACK
-//    graphics.drawRect(0, 0, width - 1, height - 1)
-//
-//    graphics.color = Color.RED
-//    graphics.drawLine(0, 0, width - 1, height - 1)
-//    graphics.drawLine(width - 1, 0, 0, height - 1)
-//
-//    ImageIO.write(img, "png", File(outputPath))
-//}
+fun drawCrossedOutRectangle() {
+    val scanner = Scanner(System.`in`)
+
+    val (width, height) = getRectangleSize(scanner)
+    val outputPath = getImageName(scanner)
+
+    val img = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+    val graphics = img.graphics
+
+    graphics.color = Color.BLACK
+    graphics.drawRect(0, 0, width - 1, height - 1)
+
+    graphics.color = Color.RED
+    graphics.drawLine(0, 0, width - 1, height - 1)
+    graphics.drawLine(width - 1, 0, 0, height - 1)
+
+    ImageIO.write(img, "png", File(outputPath))
+}
 
 fun getRectangleSize(scanner: Scanner): Pair<Int, Int> {
     println("Enter rectangle width:")
