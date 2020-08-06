@@ -48,14 +48,14 @@ fun getEnergyArrayOfImage(image: BufferedImage): Array<DoubleArray> {
                 else -> j
             }
 
-            val colorLeftX = Color(image.getRGB(posX - 1, posY))
-            val colorRightX = Color(image.getRGB(posX + 1, posY))
+            val colorLeftX = Color(image.getRGB(posX - 1, j))
+            val colorRightX = Color(image.getRGB(posX + 1, j))
             val gradientX = (colorLeftX.red.toDouble() - colorRightX.red).pow(2.0) +
                     (colorLeftX.green.toDouble() - colorRightX.green).pow(2.0) +
                     (colorLeftX.blue.toDouble() - colorRightX.blue).pow(2.0)
 
-            val colorTopY = Color(image.getRGB(posX, posY - 1))
-            val colorDownY = Color(image.getRGB(posX, posY + 1))
+            val colorTopY = Color(image.getRGB(i, posY - 1))
+            val colorDownY = Color(image.getRGB(i, posY + 1))
             val gradientY = (colorTopY.red.toDouble() - colorDownY.red).pow(2.0) +
                     (colorTopY.green.toDouble() - colorDownY.green).pow(2.0) +
                     (colorTopY.blue.toDouble() - colorDownY.blue).pow(2.0)
