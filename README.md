@@ -1,2 +1,3 @@
 # seam-carving
-Seam Carving is an Image Processing Technique for Content Aware Image Resizing. Content Aware Means that it Saves Objects and Object Aspect Ratio at Processed Image.
+Seam carving is an image processing technique for content aware image resizing.  
+Content aware means that it saves objects and object aspect ratio at processed image.
