@@ -1,4 +1,4 @@
-package seamcarving
+package seamcarving.workers
 
 import java.awt.image.BufferedImage
 import java.io.File

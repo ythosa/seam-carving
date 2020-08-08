@@ -1,8 +1,8 @@
-package seamcarving
+package seamcarving.coverters
 
 import java.awt.image.BufferedImage
 
 interface ImageConverter {
     fun convert(image: BufferedImage)
-    fun createConvertedFrom(inName: String?, outName: String?)
+    fun createConverted(inName: String?, outName: String?)
 }

@@ -1,10 +1,11 @@
-package seamcarving
+package seamcarving.coverters
 
+import seamcarving.workers.ImageWorker
 import java.awt.Color
 import java.awt.image.BufferedImage
 
 class NegativeConverter : ImageConverter {
-    override fun createConvertedFrom(inName: String?, outName: String?) {
+    override fun createConverted(inName: String?, outName: String?) {
         if (inName != null && outName != null) {
             val imgWorker = ImageWorker(inName, outName)
             val image = imgWorker.createImage()
