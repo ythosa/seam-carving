@@ -9,7 +9,7 @@ import kotlin.math.sqrt
 class EnergyConverter : ImageConverter {
     override fun createConverted(inPath: String, outPath: String) {
         val imgWorker = ImageWorker(inPath, outPath)
-        val image = imgWorker.createImage()
+        val image = imgWorker.getImage()
         this.convert(image)
         imgWorker.createImageFile(image)
     }

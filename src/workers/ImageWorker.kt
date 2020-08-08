@@ -5,7 +5,7 @@ import java.io.File
 import javax.imageio.ImageIO
 
 class ImageWorker(private val inPath: String, private val outPath: String) {
-    fun createImage(): BufferedImage {
+    fun getImage(): BufferedImage {
         val file = File(inPath)
         return ImageIO.read(file)
     }

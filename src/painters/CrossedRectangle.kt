@@ -1,20 +1,17 @@
 package seamcarving.painters
 
+import seamcarving.workers.ImageWorker
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.util.*
-import javax.imageio.ImageIO
-import java.io.File
 
-class CrossedRectangle : ImagePainter {
+class CrossedRectangle(private val outPath: String) : ImagePainter {
     override fun draw() {
         val scanner = Scanner(System.`in`)
-
         val (width, height) = getRectangleSize(scanner)
-        val outputPath = getImageName(scanner)
 
-        val img = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-        val graphics = img.graphics
+        val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+        val graphics = image.graphics
 
         graphics.color = Color.BLACK
         graphics.drawRect(0, 0, width - 1, height - 1)
@@ -23,7 +20,7 @@ class CrossedRectangle : ImagePainter {
         graphics.drawLine(0, 0, width - 1, height - 1)
         graphics.drawLine(width - 1, 0, 0, height - 1)
 
-        ImageIO.write(img, "png", File(outputPath))
+        ImageWorker("", outPath).createImageFile(image)
     }
 
     private fun getRectangleSize(scanner: Scanner): Pair<Int, Int> {
@@ -34,10 +31,5 @@ class CrossedRectangle : ImagePainter {
         val h = scanner.nextInt()
 
         return Pair(w, h)
-    }
-
-    private fun getImageName(scanner: Scanner): String {
-        println("Enter output image name:")
-        return scanner.next()
     }
 }
