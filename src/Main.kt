@@ -4,11 +4,11 @@ import seamcarving.workers.ActionWorker
 import seamcarving.workers.InputWorker
 
 fun main(args: Array<String>) {
-    val inputWorker = InputWorker()
+    val inputWorker = InputWorker(args)
 
-    val actionType = inputWorker.getArgValue(args, "-action")
-    val inPath = inputWorker.getArgValue(args, "-in")
-    val outPath = inputWorker.getArgValue(args, "-out")
+    val actionType = inputWorker.getActionType()
+    val inPath = inputWorker.getInputPath()
+    val outPath = inputWorker.getOutputPath()
 
-    ActionWorker(actionType, inPath, outPath)
+    ActionWorker(actionType, inPath, outPath).start()
 }
