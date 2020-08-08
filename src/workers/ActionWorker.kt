@@ -7,15 +7,26 @@ class ActionWorker(private val name: String?, private val inPath: String?, priva
     fun parse() {
         when (name) {
             null -> help()
+            "help" -> help()
             "energy" -> energyConverting()
             "negative" -> negativeConverting()
+            else -> wrongUsing(name)
         }
+    }
+
+    private fun wrongUsing(name: String, error: String? = null) {
+        println("Wrong using of action $name.")
+        if (!error.isNullOrEmpty()) {
+            println(error)
+        }
+        println("Get more info with help action.")
     }
 
     private fun help() {
         println("Welcome to SeamCarving.\n" +
                 "Supported flags:\n" +
-                "\t-action //- type of work with image, which could be:\n" +
+                "\t-action //- type of work with image or something else, which could be:\n" +
+                "\t\t+ help //- get help for this util\n" +
                 "\t\t+ energy //- convert image from -in path to -out path with energy filter\n" +
                 "\t\t+ negative //- convert image from -in path to -out path with negative filter\n" +
                 "\t\t+ crossed-rec //- create crossed rectangle image\n" +
@@ -27,6 +38,8 @@ class ActionWorker(private val name: String?, private val inPath: String?, priva
         if (inPath != null && outPath != null) {
             val converter = EnergyConverter()
             converter.createConverted(inPath, outPath)
+        } else {
+            wrongUsing("energy", "Invalid passed -in and/or -out flags. ")
         }
     }
 
@@ -34,6 +47,8 @@ class ActionWorker(private val name: String?, private val inPath: String?, priva
         if (inPath != null && outPath != null) {
             val converter = NegativeConverter()
             converter.createConverted(inPath, outPath)
+        } else {
+            wrongUsing("energy", "Invalid passed -in and/or -out flags. ")
         }
     }
 }
