@@ -1,6 +1,5 @@
 package seamcarving.coverters
 
-import seamcarving.*
 import seamcarving.workers.ImageWorker
 import java.awt.Color
 import java.awt.image.BufferedImage

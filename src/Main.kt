@@ -1,29 +1,18 @@
 package seamcarving
 
+import seamcarving.workers.InputWorker
 import java.awt.Color
 import java.awt.image.BufferedImage;
 import java.io.File
 import java.util.*
 import javax.imageio.ImageIO
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 fun main(args: Array<String>) {
-    val inName = getArgValue(args, "-in")
-    val outName = getArgValue(args, "-out")
+    val inputWorker = InputWorker()
+    val inName = inputWorker.getArgValue(args, "-in")
+    val outName = inputWorker.getArgValue(args, "-out")
 //    energyImageConverter(inName, outName)
 //    toNegativeImageConverter(inName, outName)
-}
-
-
-private fun getArgValue(args: Array<String>, arg: String): String? {
-    for (i in args.indices) {
-        if (args[i] == arg && i + 1 < args.size) {
-            return args[i + 1]
-        }
-    }
-
-    return null
 }
 
 private fun drawCrossedOutRectangle() {
