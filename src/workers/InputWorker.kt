@@ -7,7 +7,6 @@ class InputWorker {
                 return args[i + 1]
             }
         }
-
         return null
     }
 }

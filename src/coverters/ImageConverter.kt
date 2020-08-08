@@ -4,5 +4,5 @@ import java.awt.image.BufferedImage
 
 interface ImageConverter {
     fun convert(image: BufferedImage)
-    fun createConverted(inName: String?, outName: String?)
+    fun createConverted(inPath: String, outPath: String)
 }

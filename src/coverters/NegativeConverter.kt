@@ -5,13 +5,11 @@ import java.awt.Color
 import java.awt.image.BufferedImage
 
 class NegativeConverter : ImageConverter {
-    override fun createConverted(inName: String?, outName: String?) {
-        if (inName != null && outName != null) {
-            val imgWorker = ImageWorker(inName, outName)
-            val image = imgWorker.createImage()
-            this.convert(image)
-            imgWorker.createImageFile(image)
-        }
+    override fun createConverted(inPath: String, outPath: String) {
+        val imgWorker = ImageWorker(inPath, outPath)
+        val image = imgWorker.createImage()
+        this.convert(image)
+        imgWorker.createImageFile(image)
     }
 
     override fun convert(image: BufferedImage) {
