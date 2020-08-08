@@ -11,27 +11,11 @@ import kotlin.math.sqrt
 fun main(args: Array<String>) {
     val inName = getArgValue(args, "-in")
     val outName = getArgValue(args, "-out")
-    energyImageConverter(inName, outName)
+//    energyImageConverter(inName, outName)
 //    toNegativeImageConverter(inName, outName)
 }
 
-private fun energyImageConverter(inName: String?, outName: String?) {
-    if (inName != null && outName != null) {
-        val image = createImage(inName)
-        convertToEnergy(image)
-        createImageFile(image, outName)
-    }
-}
 
-fun convertToEnergy(image: BufferedImage) {
-    val energyArrayOfImage = getEnergyArrayOfImage(image)
-    val maxEnergyValue = getMaxEnergyValueOfImage(energyArrayOfImage)
-    for (i in 0 until image.width) {
-        for (j in 0 until image.height) {
-            image.setRGB(i, j, getNormalizedEnergyPixel(energyArrayOfImage[i][j], maxEnergyValue).rgb)
-        }
-    }
-}
 
 fun getEnergyArrayOfImage(image: BufferedImage): Array<DoubleArray> {
     val energyArrayOfImage = Array(image.width) { DoubleArray(image.height) }
@@ -87,13 +71,6 @@ fun getNormalizedEnergyPixel(energy: Double, maxEnergyValue: Double): Color {
     return Color(intensity, intensity, intensity)
 }
 
-private fun toNegativeImageConverter(inName: String?, outName: String?) {
-    if (inName != null && outName != null) {
-        val image = createImage(inName)
-        convertToNegative(image)
-        createImageFile(image, outName)
-    }
-}
 
 private fun getArgValue(args: Array<String>, arg: String): String? {
     for (i in args.indices) {
@@ -103,30 +80,6 @@ private fun getArgValue(args: Array<String>, arg: String): String? {
     }
 
     return null
-}
-
-private fun createImage(path: String): BufferedImage {
-    val file = File(path)
-    return ImageIO.read(file)
-}
-
-private fun convertToNegative(image: BufferedImage) {
-    for (i in 0 until image.width) {
-        for (j in 0 until image.height) {
-            val color = Color(image.getRGB(i, j))
-            val negative = Color(
-                    255 - color.red,
-                    255 - color.green,
-                    255 - color.blue
-            )
-            image.setRGB(i, j, negative.rgb)
-        }
-    }
-}
-
-private fun createImageFile(image: BufferedImage, fileName: String) {
-    val file = File(fileName)
-    ImageIO.write(image, "png", file)
 }
 
 private fun drawCrossedOutRectangle() {
