@@ -6,35 +6,22 @@ import java.awt.image.BufferedImage
 data class Cost(val value: Double)
 data class MatrixIndex(val i: Int, val j: Int)
 class SeamGraph() {
-    private var content: Array<Array<Pair<MatrixIndex, Cost>>> = arrayOf()
+    private lateinit var content: MutableMap<MatrixIndex, MutableMap<MatrixIndex, Cost>>
 
     constructor(matrix: Array<DoubleArray>) {
         for (i in matrix.indices) {
-            var array = arrayOf<Pair<MatrixIndex, Cost>>()
-            for (j in 1..matrix[i].lastIndex) {
-                array += Pair(MatrixIndex(i, j), Cost(10.0))
+            for (j in 1 until matrix[i].lastIndex) {
+                content[MatrixIndex(i, j)] = mutableMapOf(
+                        MatrixIndex(i + 1, j) to Cost(matrix[i + 1][j]),
+                        MatrixIndex(i + 1, j - 1) to Cost(matrix[i + 1][j - 1]),
+                        MatrixIndex(i + 1, j + 1) to Cost(matrix[i + 1][j + 1])
+                )
             }
-            content += array
         }
     }
 
-    operator fun get(i: Int): Array<Pair<MatrixIndex, Cost>> {
+    operator fun get(i: MatrixIndex): MutableMap<MatrixIndex, Cost>? {
         return content[i]
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as SeamGraph
-
-        if (!content.contentDeepEquals(other.content)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return content.contentDeepHashCode()
     }
 }
 
