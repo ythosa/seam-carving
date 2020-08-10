@@ -15,7 +15,7 @@ class EnergyConverter : ImageConverter {
     }
 
     override fun convert(image: BufferedImage) {
-        val energyArrayOfImage = getEnergyArrayOfImage(image)
+        val energyArrayOfImage = getEnergyMatrixOfImage(image)
         val maxEnergyValue = getMaxEnergyValueOfImage(energyArrayOfImage)
         for (i in 0 until image.width) {
             for (j in 0 until image.height) {
@@ -24,7 +24,7 @@ class EnergyConverter : ImageConverter {
         }
     }
 
-    private fun getEnergyArrayOfImage(image: BufferedImage): Array<DoubleArray> {
+    fun getEnergyMatrixOfImage(image: BufferedImage): Array<DoubleArray> {
         val energyArrayOfImage = Array(image.width) { DoubleArray(image.height) }
         for (i in 0 until image.width) {
             for (j in 0 until image.height) {
