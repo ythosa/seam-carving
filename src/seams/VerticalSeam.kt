@@ -3,10 +3,19 @@ package seamcarving.seams
 import seamcarving.coverters.EnergyConverter
 import java.awt.image.BufferedImage
 
-data class Cost(val value: Double)
+data class Cost(val value: Double) {
+    operator fun compareTo(c: Cost): Int {
+        return if (value < c.value) 0 else 1
+    }
+}
+
 data class MatrixIndex(val i: Int, val j: Int)
+
 class SeamGraph() {
     private lateinit var content: MutableMap<MatrixIndex, MutableMap<MatrixIndex, Cost>>
+
+    val vertices: MutableSet<MatrixIndex>
+    get() = content.keys
 
     constructor(matrix: Array<DoubleArray>) {
         for (i in matrix.indices) {
@@ -22,6 +31,30 @@ class SeamGraph() {
 
     operator fun get(i: MatrixIndex): MutableMap<MatrixIndex, Cost>? {
         return content[i]
+    }
+}
+
+class SeamCosts() {
+    private lateinit var content: MutableMap<MatrixIndex, Cost>
+    val min: MatrixIndex
+        get() {
+            var minValue = Cost(0.0)
+            var minIndex: MatrixIndex = content.keys.first()
+            for ((k, v) in content) {
+                if (v < minValue) {
+                    minValue = v
+                    minIndex = k
+                }
+            }
+
+            return minIndex
+        }
+
+    constructor(graph: SeamGraph) {
+        for (i in graph.vertices) {
+            content[i] = Cost(Double.POSITIVE_INFINITY)
+        }
+        content[MatrixIndex(0, 0)] = Cost(0.0)
     }
 }
 
