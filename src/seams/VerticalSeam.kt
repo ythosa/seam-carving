@@ -7,6 +7,25 @@ class VerticalSeam {
     fun get(image: BufferedImage) {
         val energyMatrix = fitEnergyMatrix(EnergyConverter().getEnergyMatrixOfImage(image))
 
+        val graph = SeamGraph(energyMatrix)
+        val costs = SeamCosts(graph)
+        val parents = SeamParents(graph)
+        val processed = mutableListOf<MatrixIndex>()
+
+        var node = costs.getLowest(processed)
+        while (node != null) {
+            val cost = costs[node]
+            val neighbors = graph[node]
+            for (n in neighbors?.keys!!) {
+                val newCost = cost!! + neighbors[n]
+                if (costs[n]!! > newCost) {
+                    costs[n] = newCost
+                    parents[n] = node!!
+                }
+                processed += node!!
+                node = costs.getLowest(processed)
+            }
+        }
     }
 
     private fun fitEnergyMatrix(matrix: Array<DoubleArray>): Array<DoubleArray> {
@@ -16,11 +35,5 @@ class VerticalSeam {
             fitted[matrix.size + 1][i] = 0.0
         }
         return fitted
-    }
-
-    fun getGraph(matrix: Array<DoubleArray>): Array<Array<Pair<MatrixIndex, Cost>>> {
-        val graph = arrayOf<Array<Pair<MatrixIndex, Cost>>>()
-
-        return graph
     }
 }
