@@ -17,12 +17,11 @@ class VerticalSeam {
         val energyMatrix = fitEnergyMatrix(EnergyConverter().getEnergyMatrixOfImage(image))
 
         val graph = SeamGraph(energyMatrix)
-        graph.find()
         val path = graph.getPath(MatrixIndex(0, 0),
                 MatrixIndex(energyMatrix.lastIndex, energyMatrix.first().lastIndex))
 
-        for (e in path) {
-            image.setRGB(e.i, e.j, Color.RED.rgb)
+        for (e in 0 until path.lastIndex) {
+            image.setRGB(path[e].i, path[e].j, Color.RED.rgb)
         }
     }
 
@@ -31,6 +30,14 @@ class VerticalSeam {
         for (i in matrix[0].indices) {
             fitted[0][i] = 0.0
             fitted[matrix.size + 1][i] = 0.0
+        }
+
+        var mi = 0
+        for (i in 1 until fitted.lastIndex) {
+            for (j in matrix[mi].indices) {
+                fitted[i][j] = matrix[mi][j]
+            }
+            mi++
         }
         return fitted
     }

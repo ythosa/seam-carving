@@ -2,7 +2,7 @@ package seamcarving.seams
 
 data class Cost(val value: Double) {
     operator fun compareTo(c: Cost): Int {
-        return if (value < c.value) 0 else 1
+        return if (value == c.value) 0 else if (value < c.value) -1 else 1
     }
 
     operator fun plus(cost: Cost?): Cost {
@@ -13,7 +13,7 @@ data class Cost(val value: Double) {
 data class MatrixIndex(val i: Int, val j: Int)
 
 class SeamGraph(matrix: Array<DoubleArray>) {
-    private lateinit var content: MutableMap<MatrixIndex, MutableMap<MatrixIndex, Cost>>
+    private var content: MutableMap<MatrixIndex, MutableMap<MatrixIndex, Cost>> = mutableMapOf()
 
     private var costs: SeamCosts
     private var parents: SeamParents
@@ -23,29 +23,55 @@ class SeamGraph(matrix: Array<DoubleArray>) {
         get() = content.keys
 
     init {
-        for (i in 0 until matrix.lastIndex) {
+        for (i in matrix.indices) {
             for (j in matrix[i].indices) {
-                when (j) {
-                    0 -> content[MatrixIndex(i, j)] = mutableMapOf(
-                            MatrixIndex(i + 1, j) to Cost(matrix[i + 1][j]),
-                            MatrixIndex(i + 1, j + 1) to Cost(matrix[i + 1][j + 1]))
-                    matrix[i].lastIndex -> content[MatrixIndex(i, j)] = mutableMapOf(
-                            MatrixIndex(i + 1, j) to Cost(matrix[i + 1][j]),
-                            MatrixIndex(i + 1, j - 1) to Cost(matrix[i + 1][j - 1]))
-                    else -> content[MatrixIndex(i, j)] = mutableMapOf(
-                            MatrixIndex(i + 1, j) to Cost(matrix[i + 1][j]),
-                            MatrixIndex(i + 1, j - 1) to Cost(matrix[i + 1][j - 1]),
-                            MatrixIndex(i + 1, j + 1) to Cost(matrix[i + 1][j + 1])
-                    )
+                when (i) {
+                    matrix.lastIndex -> {
+                        when (j) {
+                            matrix[i].lastIndex -> content[MatrixIndex(i, j)] = mutableMapOf()
+                            else -> content[MatrixIndex(i, j)] = mutableMapOf(
+                                    MatrixIndex(i, j + 1) to Cost(matrix[i][j + 1]))
+                        }
+                    }
+                    0 -> {
+                        when (j) {
+                            0 -> content[MatrixIndex(i, j)] = mutableMapOf(
+                                    MatrixIndex(i, j + 1) to Cost(matrix[i][j + 1]),
+                                    MatrixIndex(i + 1, j) to Cost(matrix[i + 1][j]),
+                                    MatrixIndex(i + 1, j + 1) to Cost(matrix[i + 1][j + 1]))
+                            matrix[i].lastIndex -> content[MatrixIndex(i, j)] = mutableMapOf(
+                                    MatrixIndex(i + 1, j) to Cost(matrix[i + 1][j]),
+                                    MatrixIndex(i + 1, j - 1) to Cost(matrix[i + 1][j - 1]))
+                            else -> content[MatrixIndex(i, j)] = mutableMapOf(
+                                    MatrixIndex(i, j + 1) to Cost(matrix[i][j + 1]),
+                                    MatrixIndex(i + 1, j) to Cost(matrix[i + 1][j]),
+                                    MatrixIndex(i + 1, j - 1) to Cost(matrix[i + 1][j - 1]),
+                                    MatrixIndex(i + 1, j + 1) to Cost(matrix[i + 1][j + 1])
+                            )
+                        }
+                    }
+                    else -> when (j) {
+                        0 -> content[MatrixIndex(i, j)] = mutableMapOf(
+                                MatrixIndex(i + 1, j) to Cost(matrix[i + 1][j]),
+                                MatrixIndex(i + 1, j + 1) to Cost(matrix[i + 1][j + 1]))
+                        matrix[i].lastIndex -> content[MatrixIndex(i, j)] = mutableMapOf(
+                                MatrixIndex(i + 1, j) to Cost(matrix[i + 1][j]),
+                                MatrixIndex(i + 1, j - 1) to Cost(matrix[i + 1][j - 1]))
+                        else -> content[MatrixIndex(i, j)] = mutableMapOf(
+                                MatrixIndex(i + 1, j) to Cost(matrix[i + 1][j]),
+                                MatrixIndex(i + 1, j - 1) to Cost(matrix[i + 1][j - 1]),
+                                MatrixIndex(i + 1, j + 1) to Cost(matrix[i + 1][j + 1])
+                        )
+                    }
                 }
             }
         }
-        costs = SeamCosts(this)
+        costs = SeamCosts(this) // TODO: DEPENDENCY INVERSION
         parents = SeamParents()
         processed = mutableListOf()
     }
 
-    fun find() {
+    private fun find() {
         var node = costs.getLowest(processed)
         while (node != null) {
             val cost = costs[node]
@@ -54,21 +80,26 @@ class SeamGraph(matrix: Array<DoubleArray>) {
                 val newCost = cost!! + neighbors[n]
                 if (costs[n]!! > newCost) {
                     costs[n] = newCost
-                    parents[n] = node!!
+                    parents[n] = node
                 }
-                processed.plusAssign(node!!)
-                node = costs.getLowest(processed)
             }
+            processed.plusAssign(node)
+            node = costs.getLowest(processed)
         }
     }
 
     fun getPath(start: MatrixIndex, end: MatrixIndex): MutableList<MatrixIndex> {
+        this.find()
         val result = mutableListOf<MatrixIndex>()
 
         var el = parents[end]
         while (el != start) {
-            result += el!!
-            el = parents[el!!]
+            if (el?.i!! == 0) {
+                result += el
+                break
+            }
+            result += el
+            el = parents[el]
         }
 
         result.reverse()
@@ -82,7 +113,7 @@ class SeamGraph(matrix: Array<DoubleArray>) {
 }
 
 class SeamCosts(graph: SeamGraph) {
-    private lateinit var content: MutableMap<MatrixIndex, Cost>
+    private var content: MutableMap<MatrixIndex, Cost> = mutableMapOf()
 
     init {
         for (i in graph.vertices) {
@@ -95,7 +126,7 @@ class SeamCosts(graph: SeamGraph) {
     }
 
     fun getLowest(processed: MutableList<MatrixIndex>): MatrixIndex? {
-        var minValue = Cost(0.0)
+        var minValue = Cost(Double.POSITIVE_INFINITY)
         var minIndex: MatrixIndex? = null
         for ((k, v) in content) {
             if (v < minValue && !processed.contains(k)) {
@@ -117,7 +148,7 @@ class SeamCosts(graph: SeamGraph) {
 }
 
 class SeamParents {
-    private lateinit var content: MutableMap<MatrixIndex, MatrixIndex>
+    private var content: MutableMap<MatrixIndex, MatrixIndex> = mutableMapOf()
 
     init {
         content[MatrixIndex(1, 0)] = MatrixIndex(0, 0)
