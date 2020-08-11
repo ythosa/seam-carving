@@ -66,6 +66,14 @@ class SeamGraph() {
     fun getPath(start: MatrixIndex, end: MatrixIndex): MutableList<MatrixIndex> {
         val result = mutableListOf<MatrixIndex>()
 
+        var el = parents[end]
+        while (el != start) {
+            result += el!!
+            el = parents[el!!]
+        }
+
+        result.reverse()
+
         return result
     }
 
@@ -119,5 +127,9 @@ class SeamParents() {
 
     operator fun set(n: MatrixIndex, value: MatrixIndex) {
         content[n] = value
+    }
+
+    operator fun get(el: MatrixIndex): MatrixIndex? {
+        return content[el]
     }
 }
