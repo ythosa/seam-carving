@@ -3,6 +3,7 @@ package seamcarving.workers
 import seamcarving.coverters.EnergyConverter
 import seamcarving.coverters.NegativeConverter
 import seamcarving.painters.CrossedRectangle
+import seamcarving.seams.VerticalSeam
 
 class ActionWorker(private val name: String?, private val inPath: String?, private val outPath: String?) {
     fun parse() {
@@ -12,6 +13,7 @@ class ActionWorker(private val name: String?, private val inPath: String?, priva
             "energy" -> energyConverting()
             "negative" -> negativeConverting()
             "crossed-rec" -> crossedRectangleCreating()
+            "vertical-seam" -> verticalSeamCreating()
             else -> wrongUsing(name)
         }
     }
@@ -34,6 +36,15 @@ class ActionWorker(private val name: String?, private val inPath: String?, priva
                 "\t\t+ crossed-rec //- create crossed rectangle image to -out path\n" +
                 "\t-in //- input path of existing image\n" +
                 "\t-out //- output path of created image")
+    }
+
+    private fun verticalSeamCreating() {
+        if (inPath != null && outPath != null) {
+            val vSeam = VerticalSeam()
+            vSeam.getModified(inPath, outPath)
+        } else {
+            wrongUsing("vertical-seam", "Invalid passed -in and/or -out flags. ")
+        }
     }
 
     private fun energyConverting() {

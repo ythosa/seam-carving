@@ -1,10 +1,18 @@
 package seamcarving.seams
 
 import seamcarving.coverters.EnergyConverter
+import seamcarving.workers.ImageWorker
 import java.awt.Color
 import java.awt.image.BufferedImage
 
 class VerticalSeam {
+    fun getModified(inPath: String, outPath: String) {
+        val imgWorker = ImageWorker(inPath, outPath)
+        val image = imgWorker.getImage()
+        this.get(image)
+        imgWorker.createImageFile(image)
+    }
+
     fun get(image: BufferedImage) {
         val energyMatrix = fitEnergyMatrix(EnergyConverter().getEnergyMatrixOfImage(image))
 

@@ -10,5 +10,6 @@ fun main(args: Array<String>) {
     val inPath = inputWorker.getInputPath()
     val outPath = inputWorker.getOutputPath()
 
+
     ActionWorker(actionType, inPath, outPath).parse()
 }

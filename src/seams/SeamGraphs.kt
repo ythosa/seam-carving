@@ -12,17 +12,17 @@ data class Cost(val value: Double) {
 
 data class MatrixIndex(val i: Int, val j: Int)
 
-class SeamGraph() {
+class SeamGraph(matrix: Array<DoubleArray>) {
     private lateinit var content: MutableMap<MatrixIndex, MutableMap<MatrixIndex, Cost>>
 
-    private lateinit var costs: SeamCosts
-    private lateinit var parents: SeamParents
-    private lateinit var processed: MutableList<MatrixIndex>
+    private var costs: SeamCosts
+    private var parents: SeamParents
+    private var processed: MutableList<MatrixIndex>
 
     val vertices: MutableSet<MatrixIndex>
         get() = content.keys
 
-    constructor(matrix: Array<DoubleArray>) {
+    init {
         for (i in 0 until matrix.lastIndex) {
             for (j in matrix[i].indices) {
                 when (j) {
@@ -40,10 +40,9 @@ class SeamGraph() {
                 }
             }
         }
-
         costs = SeamCosts(this)
-        parents = SeamParents(this)
-        processed = mutableListOf<MatrixIndex>()
+        parents = SeamParents()
+        processed = mutableListOf()
     }
 
     fun find() {
@@ -82,10 +81,10 @@ class SeamGraph() {
     }
 }
 
-class SeamCosts() {
+class SeamCosts(graph: SeamGraph) {
     private lateinit var content: MutableMap<MatrixIndex, Cost>
 
-    constructor(graph: SeamGraph) {
+    init {
         for (i in graph.vertices) {
             content[i] = Cost(Double.POSITIVE_INFINITY)
         }
@@ -117,10 +116,10 @@ class SeamCosts() {
     }
 }
 
-class SeamParents() {
-    lateinit var content: MutableMap<MatrixIndex, MatrixIndex>
+class SeamParents {
+    private lateinit var content: MutableMap<MatrixIndex, MatrixIndex>
 
-    constructor(graph: SeamGraph) {
+    init {
         content[MatrixIndex(1, 0)] = MatrixIndex(0, 0)
         content[MatrixIndex(1, 1)] = MatrixIndex(0, 0)
     }
