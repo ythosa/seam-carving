@@ -65,3 +65,12 @@ class SeamCosts() {
         }
     }
 }
+
+class SeamParents() {
+    private lateinit var content: MutableMap<MatrixIndex, MatrixIndex>
+
+    constructor(graph: SeamGraph) {
+        content[MatrixIndex(1, 0)] = MatrixIndex(0, 0)
+        content[MatrixIndex(1, 1)] = MatrixIndex(0, 0)
+    }
+}
