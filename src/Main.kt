@@ -10,7 +10,7 @@ import kotlin.math.max
 import kotlin.math.sqrt
 
 
-const val basePath = "/home/ythosa/Downloads/images/test"
+const val basePath = "./test/input/"
 
 data class XY(val x: Int, val y: Int)
 
@@ -84,34 +84,66 @@ class GradientImage(private val image: BufferedImage) {
     }
 }
 
-fun main(args: Array<String>) {
-    val inputFile = readImage(basePath + args[1])
-    val outputFileName = args[3]
+fun rotateImage(image: BufferedImage): BufferedImage {
+    val transformed = BufferedImage(image.height, image.width, BufferedImage.TYPE_INT_RGB)
+    for (i in 0 until image.width) {
+        for (j in 0 until image.height) {
+            transformed.setRGB(j, i, image.getRGB(i, j))
+        }
+    }
+    return transformed
+}
 
-    val gradientImage = GradientImage(inputFile)
-    val energies = Array(inputFile.height) { DoubleArray(inputFile.width) }
+fun getMinSeamY(path: List<XY>): Int {
+    return (path.sumBy { e -> e.y }) / path.size
+}
 
-    var maxEnergy = 0.0
-    repeat(inputFile.height) { height ->
-        repeat(inputFile.width) { width ->
-            val energy = gradientImage.energy(width, height)
-            energies[height][width] = energy
-            maxEnergy = max(energy, maxEnergy)
+fun removeFromSeam(image: BufferedImage, path: List<XY>, pixelsToRemove: Int): BufferedImage {
+    var sizeFragmentToRemove = getMinSeamY(path)
+    println("$sizeFragmentToRemove $pixelsToRemove")
+    if (sizeFragmentToRemove > pixelsToRemove) sizeFragmentToRemove = pixelsToRemove
+
+    val modifiedImage = BufferedImage(image.width - sizeFragmentToRemove, image.height, BufferedImage.TYPE_INT_RGB)
+
+    if (sizeFragmentToRemove > image.width / 2) sizeFragmentToRemove -= image.width / 2
+
+    for (i in sizeFragmentToRemove until image.width) {
+        for (j in 0 until image.height) {
+            modifiedImage.setRGB(i - sizeFragmentToRemove, j, image.getRGB(i, j))
         }
     }
 
-    //val normalized = normalizeEnergies(energies, maxEnergy)
-    val shortestSeam = findShortestPath(energies)
+    return modifiedImage
+}
 
-    val outputImage = BufferedImage(inputFile.width, inputFile.height, BufferedImage.TYPE_INT_RGB)
-    outputImage.graphics.drawImage(inputFile, 0, 0, null)
+fun main(args: Array<String>) {
+    var image = readImage(basePath + args[1])
+    val outputFileName = "./${args[3]}"
 
-    val colorRed = Color(255, 0, 0).rgb
-    for (position in shortestSeam) {
-        outputImage.setRGB(position.x, position.y, colorRed)
+    var widthToRemove = args[5].toInt()
+    var heightToRemove = args[7].toInt()
+    val outputWidth = image.width - widthToRemove
+    val outputHeight = image.height - heightToRemove
+
+    var gradientImage: GradientImage
+    var energies: Array<DoubleArray>
+    var shortestSeam: List<XY>
+
+    while (image.width != outputWidth) {
+        widthToRemove = image.width - outputWidth
+        gradientImage = GradientImage(image)
+        energies = Array(image.height) { DoubleArray(image.width) }
+        repeat(image.height) { height ->
+            repeat(image.width) { width ->
+                val energy = gradientImage.energy(width, height)
+                energies[height][width] = energy
+            }
+        }
+        shortestSeam = findShortestPath(energies)
+        image = removeFromSeam(image, shortestSeam, widthToRemove)
     }
 
-    writeImage(outputImage, outputFileName)
+    writeImage(image, outputFileName)
 }
 
 private fun normalizeEnergies(energies: Array<DoubleArray>, maxEnergy: Double): Array<IntArray> {
