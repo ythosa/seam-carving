@@ -116,6 +116,29 @@ fun removeFromSeam(image: BufferedImage, path: List<XY>, pixelsToRemove: Int): B
     return modifiedImage
 }
 
+fun getCropped(image: BufferedImage, outputSize: Int): BufferedImage {
+    var gradientImage: GradientImage
+    var energies: Array<DoubleArray>
+    var shortestSeam: List<XY>
+    var output = image
+
+    while (output.width != outputSize) {
+        val widthToRemove = output.width - outputSize
+        gradientImage = GradientImage(output)
+        energies = Array(output.height) { DoubleArray(output.width) }
+        repeat(output.height) { height ->
+            repeat(output.width) { width ->
+                val energy = gradientImage.energy(width, height)
+                energies[height][width] = energy
+            }
+        }
+        shortestSeam = findShortestPath(energies)
+        output = removeFromSeam(output, shortestSeam, widthToRemove)
+    }
+
+    return output
+}
+
 fun main(args: Array<String>) {
     var image = readImage(basePath + args[1])
     val outputFileName = "./${args[3]}"
@@ -129,19 +152,8 @@ fun main(args: Array<String>) {
     var energies: Array<DoubleArray>
     var shortestSeam: List<XY>
 
-    while (image.width != outputWidth) {
-        widthToRemove = image.width - outputWidth
-        gradientImage = GradientImage(image)
-        energies = Array(image.height) { DoubleArray(image.width) }
-        repeat(image.height) { height ->
-            repeat(image.width) { width ->
-                val energy = gradientImage.energy(width, height)
-                energies[height][width] = energy
-            }
-        }
-        shortestSeam = findShortestPath(energies)
-        image = removeFromSeam(image, shortestSeam, widthToRemove)
-    }
+    image = getCropped(image, outputWidth)
+    image = rotateImage(getCropped(rotateImage(image), outputHeight))
 
     writeImage(image, outputFileName)
 }
