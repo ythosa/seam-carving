@@ -6,7 +6,6 @@ import java.io.File
 import java.util.*
 import javax.imageio.ImageIO
 import kotlin.math.abs
-import kotlin.math.max
 import kotlin.math.sqrt
 
 
@@ -84,96 +83,60 @@ class GradientImage(private val image: BufferedImage) {
     }
 }
 
-fun rotateImage(image: BufferedImage): BufferedImage {
-    val transformed = BufferedImage(image.height, image.width, BufferedImage.TYPE_INT_RGB)
-    for (i in 0 until image.width) {
-        for (j in 0 until image.height) {
-            transformed.setRGB(j, i, image.getRGB(i, j))
-        }
-    }
-    return transformed
-}
-
-fun getMinSeamY(path: List<XY>): Int {
-    return (path.sumBy { e -> e.y }) / path.size
-}
-
-fun removeFromSeam(image: BufferedImage, path: List<XY>, pixelsToRemove: Int): BufferedImage {
-    var sizeFragmentToRemove = getMinSeamY(path)
-    println("$sizeFragmentToRemove $pixelsToRemove")
-    if (sizeFragmentToRemove > pixelsToRemove) sizeFragmentToRemove = pixelsToRemove
-
-    val modifiedImage = BufferedImage(image.width - sizeFragmentToRemove, image.height, BufferedImage.TYPE_INT_RGB)
-
-    if (sizeFragmentToRemove > image.width / 2) sizeFragmentToRemove -= image.width / 2
-
-    for (i in sizeFragmentToRemove until image.width) {
-        for (j in 0 until image.height) {
-            modifiedImage.setRGB(i - sizeFragmentToRemove, j, image.getRGB(i, j))
-        }
-    }
-
-    return modifiedImage
-}
-
-fun getCropped(image: BufferedImage, outputSize: Int): BufferedImage {
-    var gradientImage: GradientImage
-    var energies: Array<DoubleArray>
-    var shortestSeam: List<XY>
-    var output = image
-
-    while (output.width != outputSize) {
-        val widthToRemove = output.width - outputSize
-        gradientImage = GradientImage(output)
-        energies = Array(output.height) { DoubleArray(output.width) }
-        repeat(output.height) { height ->
-            repeat(output.width) { width ->
-                val energy = gradientImage.energy(width, height)
-                energies[height][width] = energy
-            }
-        }
-        shortestSeam = findShortestPath(energies)
-        output = removeFromSeam(output, shortestSeam, widthToRemove)
-    }
-
-    return output
-}
-
 fun main(args: Array<String>) {
-    var image = readImage(basePath + args[1])
+    val inputFile = readImage(basePath + args[1])
     val outputFileName = "./${args[3]}"
+    val verticalSeamsToRemove = args[5].toInt()
+    val horizontalSeamsToRemove = args[7].toInt()
 
-    var widthToRemove = args[5].toInt()
-    var heightToRemove = args[7].toInt()
-    val outputWidth = image.width - widthToRemove
-    val outputHeight = image.height - heightToRemove
+    var processedImage = inputFile
+    repeat(verticalSeamsToRemove) {
+        print("Removing vertical seam ${it+1} of $verticalSeamsToRemove...")
+        val energies = calculateEnergies(processedImage)
+        val shortestVerticalSeam = findShortestPath(energies)
+        processedImage = removeVerticalSeam(processedImage, shortestVerticalSeam)
+        println("Done")
+    }
 
-    var gradientImage: GradientImage
-    var energies: Array<DoubleArray>
-    var shortestSeam: List<XY>
+    repeat(horizontalSeamsToRemove) {
+        print("Removing horizontal seam ${it+1} of $horizontalSeamsToRemove...")
+        val energies = calculateEnergies(processedImage)
+        val energiesTransposed = transpose(energies)
+        val shortestHorizontalSeam = findShortestPath(energiesTransposed)
+        processedImage = removeHorizontalSeam(processedImage, shortestHorizontalSeam)
+        println("Done")
+    }
 
-    image = getCropped(image, outputWidth)
-    image = rotateImage(getCropped(rotateImage(image), outputHeight))
-
-    writeImage(image, outputFileName)
+    writeImage(processedImage, outputFileName)
 }
 
-private fun normalizeEnergies(energies: Array<DoubleArray>, maxEnergy: Double): Array<IntArray> {
+private fun calculateEnergies(inputFile: BufferedImage): Array<DoubleArray> {
+    val gradientImage = GradientImage(inputFile)
+    val energies = Array(inputFile.height) { DoubleArray(inputFile.width) }
 
-    val normalized = Array(energies.size) { IntArray(energies.first().size) }
+    repeat(inputFile.height) { height ->
+        repeat(inputFile.width) { width ->
+            val energy = gradientImage.energy(width, height)
+            energies[height][width] = energy
+        }
+    }
+    return energies
+}
 
-    repeat(energies.size) { height ->
-        repeat(energies[height].size) { width ->
-            val energy = energies[height][width]
-            val intensity = (255.0 * energy / maxEnergy).toInt()
-            normalized[height][width] = intensity
+private fun transpose(data: Array<DoubleArray>): Array<DoubleArray> {
+
+    val transposed = Array(data.first().size) { DoubleArray(data.size) }
+
+    repeat(data.size) { height ->
+        repeat(data[height].size) { width ->
+            transposed[width][height] = data[height][width]
         }
     }
 
-    return normalized
+    return transposed
 }
 
-private fun findShortestPath(weights: Array<DoubleArray>): List<XY> {
+private fun findShortestPath(weights: Array<DoubleArray>): List<Int> {
     val maxX = weights.first().lastIndex
     val maxY = weights.lastIndex
 
@@ -230,15 +193,55 @@ private fun getNeighbours(xy: XY, maxX: Int, maxY: Int): List<XY> {
     return arr
 }
 
-private fun reconstructPath(target: XY, prev: HashMap<XY, XY>): List<XY> {
-    val path = arrayListOf<XY>()
+private fun reconstructPath(target: XY, prev: HashMap<XY, XY>): List<Int> {
+    val path = arrayListOf<Int>()
     var current: XY? = target
     do {
-        path.add(current!!)
+        path.add(current!!.x)
         current = prev[current]
     } while (current != null)
 
     return path.reversed()
+}
+
+private fun removeVerticalSeam(sourceImage: BufferedImage, seam: List<Int>): BufferedImage {
+
+    val targetImage = BufferedImage(sourceImage.width - 1, sourceImage.height, sourceImage.type)
+
+    repeat(sourceImage.height) { height ->
+        var newWidth = 0
+        val seamWidth = seam[height]
+
+        repeat(sourceImage.width) { width ->
+            if (width != seamWidth) {
+                val rgb = sourceImage.getRGB(width, height)
+                targetImage.setRGB(newWidth, height, rgb)
+                newWidth++
+            }
+        }
+    }
+
+    return targetImage
+}
+
+private fun removeHorizontalSeam(sourceImage: BufferedImage, seam: List<Int>): BufferedImage {
+
+    val targetImage = BufferedImage(sourceImage.width, sourceImage.height - 1, sourceImage.type)
+
+    repeat(sourceImage.width) { width ->
+        var newHeight = 0
+        val seamHeight = seam[width]
+
+        repeat(sourceImage.height) { height ->
+            if (height != seamHeight) {
+                val rgb = sourceImage.getRGB(width, height)
+                targetImage.setRGB(width, newHeight, rgb)
+                newHeight++
+            }
+        }
+    }
+
+    return targetImage
 }
 
 private fun readImage(fileName: String): BufferedImage {
