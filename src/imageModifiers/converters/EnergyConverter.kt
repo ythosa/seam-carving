@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage
 import kotlin.math.pow
 import kotlin.math.sqrt
 
+
 class EnergyConverter(override val image: BufferedImage, override val data: InputData) : ImageModifier {
     override fun get(): BufferedImage {
         val energyArrayOfImage = getEnergyMatrix()

@@ -3,13 +3,8 @@ package imageModifiers.seamcarving
 import imageModifiers.ImageModifier
 import imageModifiers.converters.EnergyConverter
 import workers.InputData
-import java.awt.Color
 import java.awt.image.BufferedImage
-import java.io.File
 import java.util.*
-import javax.imageio.ImageIO
-import kotlin.math.abs
-import kotlin.math.sqrt
 
 
 class SeamCarving(override val image: BufferedImage, override val data: InputData) : ImageModifier {

@@ -1,5 +1,6 @@
 package workers
 
+
 class InputData(private val input: Array<String>) {
     val actionType: String? = getArgValue("-action")
     val inputImagePath: String? = getArgValue("-in")

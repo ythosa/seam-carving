@@ -5,6 +5,7 @@ import workers.InputData
 import java.awt.Color
 import java.awt.image.BufferedImage
 
+
 class NegativeConverter(override val image: BufferedImage, override val data: InputData) : ImageModifier {
     override fun get(): BufferedImage {
         for (i in 0 until image.width) {

@@ -1,7 +1,5 @@
 package workers
 
-import imageModifiers.converters.EnergyConverter
-import imageModifiers.converters.NegativeConverter
 
 class InputWorker(private val input: Array<String>) {
     private val inputData = InputData(input)
@@ -10,7 +8,7 @@ class InputWorker(private val input: Array<String>) {
         when (inputData.actionType) {
             null -> help()
             "help" -> help()
-            else -> ActionWorker(inputData)
+            else -> ActionWorker(inputData).convert()
         }
     }
 

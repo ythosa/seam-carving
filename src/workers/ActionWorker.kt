@@ -1,8 +1,10 @@
 package workers
 
 import imageModifiers.ImageModifier
-import imageModifiers.converters.*
-import imageModifiers.seamcarving.*
+import imageModifiers.converters.EnergyConverter
+import imageModifiers.converters.NegativeConverter
+import imageModifiers.seamcarving.SeamCarving
+
 
 class ActionWorker(private val data: InputData) {
     private var imageModifier: ImageModifier? = null
@@ -18,10 +20,14 @@ class ActionWorker(private val data: InputData) {
         }
     }
 
-    fun convert(inPath: String, outPath: String) {
-        val imageWorker = ImageWorker(inPath, outPath)
+    fun convert() {
+        if (data.inputImagePath == null || data.outputImagePath == null)
+            throw Error("Input path and output path must be initialized!")
 
-        if (imageModifier == null) throw Error("Invalid action name!")
+        val imageWorker = ImageWorker(data.inputImagePath, data.outputImagePath)
+
+        if (imageModifier == null)
+            throw Error("Invalid action name!")
 
         imageWorker.createImageFile(imageModifier!!.get())
     }
