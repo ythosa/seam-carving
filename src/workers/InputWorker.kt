@@ -31,6 +31,6 @@ class InputWorker(private val input: Array<String>) {
                 "\t-in //- input path of existing image\n" +
                 "\t-out //- output path of created image\n" +
                 "\t-width //- width to remove with seam-carving\n" +
-                "\t -height //- height to remove with seam-carving")
+                "\t-height //- height to remove with seam-carving")
     }
 }
