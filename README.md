@@ -28,10 +28,19 @@ Seam Carving is util with CLI, which supports the following flags:
 *   -height //- height to remove with seam-carving
 
 
-## What it looks like
+## Using example
+### Transformation to negative
+*   Input image:
 
 <div align="center">
-    <img src="assets/demonstration.gif" alt="Demonstration"/>
+    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/input/blue.png" alt="Input image"/>
+</div>
+
+*   Command: `java MainKt -action to-negative -in ./test/input/blue.png -out ./test/output/blue_negative.png`
+*   Output image:
+
+<div align="center">
+    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/output/blue_negative.png" alt="Output image"/>
 </div>
 
 
