@@ -1,6 +1,7 @@
 package imageModifiers.seamcarving
 
 import imageModifiers.ImageModifier
+import imageModifiers.converters.EnergyConverter
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
@@ -9,8 +10,6 @@ import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.math.sqrt
 
-
-const val basePath = "./test/input/"
 
 data class XY(val x: Int, val y: Int)
 
@@ -85,20 +84,11 @@ class GradientImage(private val image: BufferedImage) {
 }
 
 class SeamCarving : ImageModifier {
-    fun get(image: BufferedImage) {
-        TODO("CMOOON")
-    }
-
-    fun GETSEAMCARVINGIMAGE(args: Array<String>) {
-        val inputFile = readImage(basePath + args[1])
-        val outputFileName = "./${args[3]}"
-        val verticalSeamsToRemove = args[5].toInt()
-        val horizontalSeamsToRemove = args[7].toInt()
-
-        var processedImage = inputFile
+    override fun get(image: BufferedImage, verticalSeamsToRemove: Int, horizontalSeamsToRemove: Int): BufferedImage {
+        var processedImage = image
         repeat(verticalSeamsToRemove) {
             print("Removing vertical seam ${it + 1} of $verticalSeamsToRemove...")
-            val energies = calculateEnergies(processedImage)
+            val energies = EnergyConverter().getEnergyMatrixOfImage(processedImage)
             val shortestVerticalSeam = findShortestPath(energies)
             processedImage = removeVerticalSeam(processedImage, shortestVerticalSeam)
             println("Done")
@@ -106,149 +96,131 @@ class SeamCarving : ImageModifier {
 
         repeat(horizontalSeamsToRemove) {
             print("Removing horizontal seam ${it + 1} of $horizontalSeamsToRemove...")
-            val energies = calculateEnergies(processedImage)
+            val energies = EnergyConverter().getEnergyMatrixOfImage(processedImage)
             val energiesTransposed = transpose(energies)
             val shortestHorizontalSeam = findShortestPath(energiesTransposed)
             processedImage = removeHorizontalSeam(processedImage, shortestHorizontalSeam)
             println("Done")
         }
-
-        writeImage(processedImage, outputFileName)
-    }
-}
-
-private fun calculateEnergies(inputFile: BufferedImage): Array<DoubleArray> {
-    val gradientImage = GradientImage(inputFile)
-    val energies = Array(inputFile.height) { DoubleArray(inputFile.width) }
-
-    repeat(inputFile.height) { height ->
-        repeat(inputFile.width) { width ->
-            val energy = gradientImage.energy(width, height)
-            energies[height][width] = energy
-        }
-    }
-    return energies
-}
-
-private fun transpose(data: Array<DoubleArray>): Array<DoubleArray> {
-
-    val transposed = Array(data.first().size) { DoubleArray(data.size) }
-
-    repeat(data.size) { height ->
-        repeat(data[height].size) { width ->
-            transposed[width][height] = data[height][width]
-        }
     }
 
-    return transposed
-}
+    private fun findShortestPath(weights: Array<DoubleArray>): List<Int> {
+        val maxX = weights.first().lastIndex
+        val maxY = weights.lastIndex
 
-private fun findShortestPath(weights: Array<DoubleArray>): List<Int> {
-    val maxX = weights.first().lastIndex
-    val maxY = weights.lastIndex
-
-    val distances = Array(maxY + 1) { y ->
-        DoubleArray(maxX + 1) {
-            if (y == 0) weights[0][it]
-            else Double.MAX_VALUE
-        }
-    }
-
-    val queueComparator = Comparator<XYPriority> { p0, p1 -> p0.priority.compareTo(p1.priority) }
-    val queue = PriorityQueue(queueComparator)
-    for (x in 0..maxX) {
-        queue.offer(XYPriority(XY(x, 0), weights[0][x]))
-    }
-
-    val prev = HashMap<XY, XY>()
-
-    while (queue.isNotEmpty()) {
-        val lowestWeight = queue.remove()
-        val currentDistance = distances[lowestWeight.xy.y][lowestWeight.xy.x]
-
-        val neighbors = getNeighbours(lowestWeight.xy, maxX, maxY)
-        for (neighbor in neighbors) {
-            val newDistance = currentDistance + weights[neighbor.y][neighbor.x]
-            if (newDistance < distances[neighbor.y][neighbor.x]) {
-                distances[neighbor.y][neighbor.x] = newDistance
-                prev[neighbor] = lowestWeight.xy
-                queue.offer(XYPriority(neighbor, newDistance))
+        val distances = Array(maxY + 1) { y ->
+            DoubleArray(maxX + 1) {
+                if (y == 0) weights[0][it]
+                else Double.MAX_VALUE
             }
         }
-    }
 
-    val targetX = distances.last().withIndex().minBy { x -> x.value }!!.index
-    val target = XY(targetX, distances.lastIndex)
+        val queueComparator = Comparator<XYPriority> { p0, p1 -> p0.priority.compareTo(p1.priority) }
+        val queue = PriorityQueue(queueComparator)
+        for (x in 0..maxX) {
+            queue.offer(XYPriority(XY(x, 0), weights[0][x]))
+        }
 
-    return reconstructPath(target, prev)
-}
+        val prev = HashMap<XY, XY>()
 
-private fun getNeighbours(xy: XY, maxX: Int, maxY: Int): List<XY> {
-    if (xy.y == maxY) return emptyList()
+        while (queue.isNotEmpty()) {
+            val lowestWeight = queue.remove()
+            val currentDistance = distances[lowestWeight.xy.y][lowestWeight.xy.x]
 
-    val arr = arrayListOf<XY>()
-
-    val lowerLeft = XY(xy.x - 1, xy.y + 1)
-    if (lowerLeft.x >= 0) arr.add(lowerLeft)
-
-    val lowerMedium = XY(xy.x, xy.y + 1)
-    arr.add(lowerMedium)
-
-    val lowerRight = XY(xy.x + 1, xy.y + 1)
-    if (lowerRight.x <= maxX) arr.add(lowerRight)
-
-    return arr
-}
-
-private fun reconstructPath(target: XY, prev: HashMap<XY, XY>): List<Int> {
-    val path = arrayListOf<Int>()
-    var current: XY? = target
-    do {
-        path.add(current!!.x)
-        current = prev[current]
-    } while (current != null)
-
-    return path.reversed()
-}
-
-private fun removeVerticalSeam(sourceImage: BufferedImage, seam: List<Int>): BufferedImage {
-
-    val targetImage = BufferedImage(sourceImage.width - 1, sourceImage.height, sourceImage.type)
-
-    repeat(sourceImage.height) { height ->
-        var newWidth = 0
-        val seamWidth = seam[height]
-
-        repeat(sourceImage.width) { width ->
-            if (width != seamWidth) {
-                val rgb = sourceImage.getRGB(width, height)
-                targetImage.setRGB(newWidth, height, rgb)
-                newWidth++
+            val neighbors = getNeighbours(lowestWeight.xy, maxX, maxY)
+            for (neighbor in neighbors) {
+                val newDistance = currentDistance + weights[neighbor.y][neighbor.x]
+                if (newDistance < distances[neighbor.y][neighbor.x]) {
+                    distances[neighbor.y][neighbor.x] = newDistance
+                    prev[neighbor] = lowestWeight.xy
+                    queue.offer(XYPriority(neighbor, newDistance))
+                }
             }
         }
+
+        val targetX = distances.last().withIndex().minBy { x -> x.value }!!.index
+        val target = XY(targetX, distances.lastIndex)
+
+        return reconstructPath(target, prev)
     }
 
-    return targetImage
-}
-
-private fun removeHorizontalSeam(sourceImage: BufferedImage, seam: List<Int>): BufferedImage {
-
-    val targetImage = BufferedImage(sourceImage.width, sourceImage.height - 1, sourceImage.type)
-
-    repeat(sourceImage.width) { width ->
-        var newHeight = 0
-        val seamHeight = seam[width]
+    private fun removeVerticalSeam(sourceImage: BufferedImage, seam: List<Int>): BufferedImage {
+        val targetImage = BufferedImage(sourceImage.width - 1, sourceImage.height, sourceImage.type)
 
         repeat(sourceImage.height) { height ->
-            if (height != seamHeight) {
-                val rgb = sourceImage.getRGB(width, height)
-                targetImage.setRGB(width, newHeight, rgb)
-                newHeight++
+            var newWidth = 0
+            val seamWidth = seam[height]
+
+            repeat(sourceImage.width) { width ->
+                if (width != seamWidth) {
+                    val rgb = sourceImage.getRGB(width, height)
+                    targetImage.setRGB(newWidth, height, rgb)
+                    newWidth++
+                }
             }
         }
+
+        return targetImage
     }
 
-    return targetImage
+    private fun removeHorizontalSeam(sourceImage: BufferedImage, seam: List<Int>): BufferedImage {
+        val targetImage = BufferedImage(sourceImage.width, sourceImage.height - 1, sourceImage.type)
+
+        repeat(sourceImage.width) { width ->
+            var newHeight = 0
+            val seamHeight = seam[width]
+
+            repeat(sourceImage.height) { height ->
+                if (height != seamHeight) {
+                    val rgb = sourceImage.getRGB(width, height)
+                    targetImage.setRGB(width, newHeight, rgb)
+                    newHeight++
+                }
+            }
+        }
+
+        return targetImage
+    }
+
+    private fun transpose(data: Array<DoubleArray>): Array<DoubleArray> {
+        val transposed = Array(data.first().size) { DoubleArray(data.size) }
+
+        repeat(data.size) { height ->
+            repeat(data[height].size) { width ->
+                transposed[width][height] = data[height][width]
+            }
+        }
+
+        return transposed
+    }
+
+    private fun getNeighbours(xy: XY, maxX: Int, maxY: Int): List<XY> {
+        if (xy.y == maxY) return emptyList()
+
+        val arr = arrayListOf<XY>()
+
+        val lowerLeft = XY(xy.x - 1, xy.y + 1)
+        if (lowerLeft.x >= 0) arr.add(lowerLeft)
+
+        val lowerMedium = XY(xy.x, xy.y + 1)
+        arr.add(lowerMedium)
+
+        val lowerRight = XY(xy.x + 1, xy.y + 1)
+        if (lowerRight.x <= maxX) arr.add(lowerRight)
+
+        return arr
+    }
+
+    private fun reconstructPath(target: XY, prev: HashMap<XY, XY>): List<Int> {
+        val path = arrayListOf<Int>()
+        var current: XY? = target
+        do {
+            path.add(current!!.x)
+            current = prev[current]
+        } while (current != null)
+
+        return path.reversed()
+    }
 }
 
 private fun readImage(fileName: String): BufferedImage {

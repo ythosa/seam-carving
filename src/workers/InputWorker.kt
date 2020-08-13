@@ -4,29 +4,10 @@ import imageModifiers.converters.EnergyConverter
 import imageModifiers.converters.NegativeConverter
 
 class InputWorker(private val input: Array<String>) {
-    private fun getArgValue(arg: String): String? {
-        for (i in input.indices) {
-            if (input[i] == arg && i + 1 < input.size) {
-                return input[i + 1]
-            }
-        }
-        return null
-    }
-
-    fun getActionType(): String? {
-        return getArgValue("-action")
-    }
-
-    fun getInputPath(): String? {
-        return getArgValue("-in")
-    }
-
-    fun getOutputPath(): String? {
-        return getArgValue("-out")
-    }
+    private val inputData = InputData(input)
 
     fun parse() {
-        when (name) {
+        when (inputData.actionType) {
             null -> help()
             "help" -> help()
             "energy" -> energyConverting()
