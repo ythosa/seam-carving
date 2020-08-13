@@ -9,10 +9,9 @@ import imageModifiers.seamcarving.SeamCarving
 class ActionWorker(private val data: InputData) {
     private var imageModifier: ImageModifier? = null
 
-    constructor() {
+    init {
         val imageWorker = ImageWorker(data.inputImagePath!!, data.outputImagePath!!)
         val image = imageWorker.getImage()
-
         when (data.actionType) {
             "to-energy" -> imageModifier = EnergyConverter(image, data)
             "to-negative" -> imageModifier = NegativeConverter(image, data)
