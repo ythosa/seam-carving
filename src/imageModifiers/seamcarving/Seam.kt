@@ -1,5 +1,6 @@
 package imageModifiers.seamcarving
 
+import imageModifiers.ImageModifier
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
@@ -83,31 +84,37 @@ class GradientImage(private val image: BufferedImage) {
     }
 }
 
-fun GETSEAMCARVINGIMAGE(args: Array<String>) {
-    val inputFile = readImage(basePath + args[1])
-    val outputFileName = "./${args[3]}"
-    val verticalSeamsToRemove = args[5].toInt()
-    val horizontalSeamsToRemove = args[7].toInt()
-
-    var processedImage = inputFile
-    repeat(verticalSeamsToRemove) {
-        print("Removing vertical seam ${it+1} of $verticalSeamsToRemove...")
-        val energies = calculateEnergies(processedImage)
-        val shortestVerticalSeam = findShortestPath(energies)
-        processedImage = removeVerticalSeam(processedImage, shortestVerticalSeam)
-        println("Done")
+class SeamCarving : ImageModifier {
+    fun get(image: BufferedImage) {
+        TODO("CMOOON")
     }
 
-    repeat(horizontalSeamsToRemove) {
-        print("Removing horizontal seam ${it+1} of $horizontalSeamsToRemove...")
-        val energies = calculateEnergies(processedImage)
-        val energiesTransposed = transpose(energies)
-        val shortestHorizontalSeam = findShortestPath(energiesTransposed)
-        processedImage = removeHorizontalSeam(processedImage, shortestHorizontalSeam)
-        println("Done")
-    }
+    fun GETSEAMCARVINGIMAGE(args: Array<String>) {
+        val inputFile = readImage(basePath + args[1])
+        val outputFileName = "./${args[3]}"
+        val verticalSeamsToRemove = args[5].toInt()
+        val horizontalSeamsToRemove = args[7].toInt()
 
-    writeImage(processedImage, outputFileName)
+        var processedImage = inputFile
+        repeat(verticalSeamsToRemove) {
+            print("Removing vertical seam ${it + 1} of $verticalSeamsToRemove...")
+            val energies = calculateEnergies(processedImage)
+            val shortestVerticalSeam = findShortestPath(energies)
+            processedImage = removeVerticalSeam(processedImage, shortestVerticalSeam)
+            println("Done")
+        }
+
+        repeat(horizontalSeamsToRemove) {
+            print("Removing horizontal seam ${it + 1} of $horizontalSeamsToRemove...")
+            val energies = calculateEnergies(processedImage)
+            val energiesTransposed = transpose(energies)
+            val shortestHorizontalSeam = findShortestPath(energiesTransposed)
+            processedImage = removeHorizontalSeam(processedImage, shortestHorizontalSeam)
+            println("Done")
+        }
+
+        writeImage(processedImage, outputFileName)
+    }
 }
 
 private fun calculateEnergies(inputFile: BufferedImage): Array<DoubleArray> {
