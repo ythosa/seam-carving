@@ -1,7 +1,5 @@
-package seamcarving
-
-import seamcarving.workers.ActionWorker
-import seamcarving.workers.InputWorker
+import workers.ActionWorker
+import workers.InputWorker
 
 fun main(args: Array<String>) {
     val inputWorker = InputWorker(args)

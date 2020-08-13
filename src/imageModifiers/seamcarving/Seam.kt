@@ -1,4 +1,4 @@
-package seamcarving.seams
+package imageModifiers.seamcarving
 
 import java.awt.Color
 import java.awt.image.BufferedImage

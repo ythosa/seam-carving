@@ -1,4 +1,4 @@
-package seamcarving.painters
+package painters
 
 interface ImagePainter {
     fun draw()

@@ -1,6 +1,6 @@
-package seamcarving.painters
+package painters
 
-import seamcarving.workers.ImageWorker
+import workers.ImageWorker
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.util.*

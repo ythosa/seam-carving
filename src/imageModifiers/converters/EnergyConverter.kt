@@ -1,20 +1,13 @@
-package seamcarving.coverters
+package imageModifiers.converters
 
-import seamcarving.workers.ImageWorker
+import imageModifiers.ImageModifier
 import java.awt.Color
 import java.awt.image.BufferedImage
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class EnergyConverter : ImageConverter {
-    override fun createConverted(inPath: String, outPath: String) {
-        val imgWorker = ImageWorker(inPath, outPath)
-        val image = imgWorker.getImage()
-        this.convert(image)
-        imgWorker.createImageFile(image)
-    }
-
-    override fun convert(image: BufferedImage) {
+class EnergyConverter : ImageModifier {
+    override fun get(image: BufferedImage) {
         val energyArrayOfImage = getEnergyMatrixOfImage(image)
         val maxEnergyValue = getMaxEnergyValueOfImage(energyArrayOfImage)
         for (i in 0 until image.width) {

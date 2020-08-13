@@ -1,4 +1,4 @@
-package seamcarving.workers
+package workers
 
 class InputWorker(private val input: Array<String>) {
     private fun getArgValue(arg: String): String? {

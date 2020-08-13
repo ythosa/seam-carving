@@ -1,9 +1,8 @@
-package seamcarving.workers
+package workers
 
-import seamcarving.coverters.EnergyConverter
-import seamcarving.coverters.NegativeConverter
-import seamcarving.painters.CrossedRectangle
-import seamcarving.seams.VerticalSeam
+import imageModifiers.converters.EnergyConverter
+import imageModifiers.converters.NegativeConverter
+import painters.CrossedRectangle
 
 class ActionWorker(private val name: String?, private val inPath: String?, private val outPath: String?) {
     fun parse() {
