@@ -43,20 +43,6 @@ Seam Carving is util with CLI, which supports the following flags:
     <img src="https://github.com/Ythosa/seam-carving/blob/master/test/output/blue_seamcarving.png" alt="Output image"/>
 </div>
 
-### Transformation to negative
-*   Input image:
-
-<div align="center">
-    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/input/blue.png" alt="Input image"/>
-</div>
-
-*   Command: `java MainKt -action to-negative -in ./test/input/blue.png -out ./test/output/blue_negative.png`
-*   Output image:
-
-<div align="center">
-    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/output/blue_negative.png" alt="Output image"/>
-</div>
-
 ### Transformation to energy
 *   Input image:
 
@@ -69,6 +55,20 @@ Seam Carving is util with CLI, which supports the following flags:
 
 <div align="center">
     <img src="https://github.com/Ythosa/seam-carving/blob/master/test/output/trees_energy.png" alt="Output image"/>
+</div>
+
+### Transformation to negative
+*   Input image:
+
+<div align="center">
+    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/input/blue.png" alt="Input image"/>
+</div>
+
+*   Command: `java MainKt -action to-negative -in ./test/input/blue.png -out ./test/output/blue_negative.png`
+*   Output image:
+
+<div align="center">
+    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/output/blue_negative.png" alt="Output image"/>
 </div>
 
 
