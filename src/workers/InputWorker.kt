@@ -25,10 +25,12 @@ class InputWorker(private val input: Array<String>) {
                 "Supported flags:\n" +
                 "\t-action //- type of work with image or something else, which could be:\n" +
                 "\t\t+ help //- get help for this util\n" +
-                "\t\t+ energy //- convert image from -in path to -out path with energy filter\n" +
-                "\t\t+ negative //- convert image from -in path to -out path with negative filter\n" +
-                "\t\t+ crossed-rec //- create crossed rectangle image to -out path\n" +
+                "\t\t+ to-energy //- convert image from -in path to -out path with energy filter\n" +
+                "\t\t+ to-negative //- convert image from -in path to -out path with negative filter\n" +
+                "\t\t+ seam-carving //- seam-carving -width & -height image from -in path to -out path\n" +
                 "\t-in //- input path of existing image\n" +
-                "\t-out //- output path of created image")
+                "\t-out //- output path of created image\n" +
+                "\t-width //- width to remove with seam-carving\n" +
+                "\t -height //- height to remove with seam-carving")
     }
 }
