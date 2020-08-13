@@ -29,6 +29,20 @@ Seam Carving is util with CLI, which supports the following flags:
 
 
 ## Using example
+### Image seam carving
+*   Input image:
+
+<div align="center">
+    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/input/blue.png" alt="Input image"/>
+</div>
+
+*   Command: `java MainKt -action seam-carving -in ./test/input/blue.png -out ./test/output/blue_seamcarving.png -width 125 -height 50`
+*   Output image:
+
+<div align="center">
+    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/output/blue_seamcarving.png" alt="Output image"/>
+</div>
+
 ### Transformation to negative
 *   Input image:
 
@@ -47,15 +61,16 @@ Seam Carving is util with CLI, which supports the following flags:
 *   Input image:
 
 <div align="center">
-    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/input/tree.png" alt="Input image"/>
+    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/input/trees.png" alt="Input image"/>
 </div>
 
 *   Command: `java MainKt -action to-energy -in ./test/input/tree.png -out ./test/output/tree_energy.png`
 *   Output image:
 
 <div align="center">
-    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/output/tree_energy.png" alt="Output image"/>
+    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/output/trees_energy.png" alt="Output image"/>
 </div>
+
 
 ## FAQ
 _Q_: How can I help to develop this project?  
