@@ -4,25 +4,25 @@ import imageModifiers.ImageModifier
 import imageModifiers.converters.*
 import imageModifiers.seamcarving.*
 
-class ActionWorker(private val name: String?, private val inPath: String?, private val outPath: String?) {
+class ActionWorker(private val data: InputData) {
     private var imageModifier: ImageModifier? = null
 
     constructor() {
-        when (name) {
-            "to-energy" -> imageModifier = EnergyConverter()
-            "to-negative" -> imageModifier = NegativeConverter()
-            "seam-carving" -> imageModifier = SeamCarving()
+        val imageWorker = ImageWorker(data.inputImagePath!!, data.outputImagePath!!)
+        val image = imageWorker.getImage()
+
+        when (data.actionType) {
+            "to-energy" -> imageModifier = EnergyConverter(image, data)
+            "to-negative" -> imageModifier = NegativeConverter(image, data)
+            "seam-carving" -> imageModifier = SeamCarving(image, data)
         }
     }
 
     fun convert(inPath: String, outPath: String) {
         val imageWorker = ImageWorker(inPath, outPath)
-        val image = imageWorker.getImage()
 
         if (imageModifier == null) throw Error("Invalid action name!")
 
-        imageModifier!!.get(image)
-
-        imageWorker.createImageFile(image)
+        imageWorker.createImageFile(imageModifier!!.get())
     }
 }

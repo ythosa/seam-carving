@@ -2,6 +2,7 @@ package imageModifiers.seamcarving
 
 import imageModifiers.ImageModifier
 import imageModifiers.converters.EnergyConverter
+import workers.InputData
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
@@ -83,25 +84,31 @@ class GradientImage(private val image: BufferedImage) {
     }
 }
 
-class SeamCarving : ImageModifier {
-    override fun get(image: BufferedImage, verticalSeamsToRemove: Int, horizontalSeamsToRemove: Int): BufferedImage {
+class SeamCarving(override val image: BufferedImage, override val data: InputData) : ImageModifier {
+    override fun get(): BufferedImage {
+        if (data.verticalSeamsToRemove == null || data.horizontalSeamsToRemove == null) {
+            throw Error("verticalSeamsToRemove & horizontalSeamsToRemove must be initialized")
+        }
+
         var processedImage = image
-        repeat(verticalSeamsToRemove) {
-            print("Removing vertical seam ${it + 1} of $verticalSeamsToRemove...")
-            val energies = EnergyConverter().getEnergyMatrixOfImage(processedImage)
+        repeat(data.verticalSeamsToRemove) {
+            print("Removing vertical seam ${it + 1} of ${data.verticalSeamsToRemove}...")
+            val energies = EnergyConverter(processedImage, data).getEnergyMatrix()
             val shortestVerticalSeam = findShortestPath(energies)
             processedImage = removeVerticalSeam(processedImage, shortestVerticalSeam)
             println("Done")
         }
 
-        repeat(horizontalSeamsToRemove) {
-            print("Removing horizontal seam ${it + 1} of $horizontalSeamsToRemove...")
-            val energies = EnergyConverter().getEnergyMatrixOfImage(processedImage)
+        repeat(data.horizontalSeamsToRemove) {
+            print("Removing horizontal seam ${it + 1} of ${data.horizontalSeamsToRemove}...")
+            val energies = EnergyConverter(processedImage, data).getEnergyMatrix()
             val energiesTransposed = transpose(energies)
             val shortestHorizontalSeam = findShortestPath(energiesTransposed)
             processedImage = removeHorizontalSeam(processedImage, shortestHorizontalSeam)
             println("Done")
         }
+
+        return processedImage
     }
 
     private fun findShortestPath(weights: Array<DoubleArray>): List<Int> {

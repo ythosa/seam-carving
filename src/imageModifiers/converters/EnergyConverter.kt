@@ -1,23 +1,26 @@
 package imageModifiers.converters
 
 import imageModifiers.ImageModifier
+import workers.InputData
 import java.awt.Color
 import java.awt.image.BufferedImage
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class EnergyConverter : ImageModifier {
-    override fun get(image: BufferedImage) {
-        val energyArrayOfImage = getEnergyMatrixOfImage(image)
+class EnergyConverter(override val image: BufferedImage, override val data: InputData) : ImageModifier {
+    override fun get(): BufferedImage {
+        val energyArrayOfImage = getEnergyMatrix()
         val maxEnergyValue = getMaxEnergyValueOfImage(energyArrayOfImage)
         for (i in 0 until image.width) {
             for (j in 0 until image.height) {
                 image.setRGB(i, j, getNormalizedEnergyPixel(energyArrayOfImage[i][j], maxEnergyValue).rgb)
             }
         }
+
+        return image
     }
 
-    fun getEnergyMatrixOfImage(image: BufferedImage): Array<DoubleArray> {
+    fun getEnergyMatrix(): Array<DoubleArray> {
         val energyArrayOfImage = Array(image.width) { DoubleArray(image.height) }
         for (i in 0 until image.width) {
             for (j in 0 until image.height) {

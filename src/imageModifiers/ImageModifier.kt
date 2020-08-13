@@ -1,7 +1,10 @@
 package imageModifiers
 
+import workers.InputData
 import java.awt.image.BufferedImage
 
 interface ImageModifier {
-    fun get(image: BufferedImage)
+    val image: BufferedImage
+    val data: InputData
+    fun get(): BufferedImage
 }
