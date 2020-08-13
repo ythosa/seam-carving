@@ -12,10 +12,6 @@ import kotlin.math.abs
 import kotlin.math.sqrt
 
 
-data class XY(val x: Int, val y: Int)
-
-data class XYPriority(val xy: XY, val priority: Double)
-
 class SeamCarving(override val image: BufferedImage, override val data: InputData) : ImageModifier {
     override fun get(): BufferedImage {
         if (data.verticalSeamsToRemove == null || data.horizontalSeamsToRemove == null) {
