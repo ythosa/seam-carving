@@ -43,6 +43,19 @@ Seam Carving is util with CLI, which supports the following flags:
     <img src="https://github.com/Ythosa/seam-carving/blob/master/test/output/blue_negative.png" alt="Output image"/>
 </div>
 
+### Transformation to energy
+*   Input image:
+
+<div align="center">
+    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/input/tree.png" alt="Input image"/>
+</div>
+
+*   Command: `java MainKt -action to-energy -in ./test/input/tree.png -out ./test/output/tree_energy.png`
+*   Output image:
+
+<div align="center">
+    <img src="https://github.com/Ythosa/seam-carving/blob/master/test/output/tree_energy.png" alt="Output image"/>
+</div>
 
 ## FAQ
 _Q_: How can I help to develop this project?  
