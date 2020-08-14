@@ -75,6 +75,7 @@ Seam Carving is util with CLI, which supports the following flags:
 Other examples could be find at 
 *   input images -> https://github.com/Ythosa/seam-carving/tree/master/test/input
 *   output images -> https://github.com/Ythosa/seam-carving/tree/master/test/output  
+
 All files are named clearly :)
 
 ## FAQ
