@@ -71,6 +71,11 @@ Seam Carving is util with CLI, which supports the following flags:
     <img src="https://github.com/Ythosa/seam-carving/blob/master/test/output/blue_negative.png" alt="Output image"/>
 </div>
 
+### Other examples 
+Other examples could be find at 
+*   input images -> https://github.com/Ythosa/seam-carving/tree/master/test/input
+*   output images -> https://github.com/Ythosa/seam-carving/tree/master/test/output  
+All files are named clearly :)
 
 ## FAQ
 _Q_: How can I help to develop this project?  
