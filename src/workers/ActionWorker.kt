@@ -10,7 +10,10 @@ class ActionWorker(private val data: InputData) {
     private var imageModifier: ImageModifier? = null
 
     init {
-        val imageWorker = ImageWorker(data.inputImagePath!!, data.outputImagePath!!)
+        if (data.inputImagePath == null || data.outputImagePath == null)
+            throw Error("Input path and output path must be initialized!")
+
+        val imageWorker = ImageWorker(data.inputImagePath, data.outputImagePath)
         val image = imageWorker.getImage()
         when (data.actionType) {
             "to-energy" -> imageModifier = EnergyConverter(image, data)
@@ -20,10 +23,7 @@ class ActionWorker(private val data: InputData) {
     }
 
     fun convert() {
-        if (data.inputImagePath == null || data.outputImagePath == null)
-            throw Error("Input path and output path must be initialized!")
-
-        val imageWorker = ImageWorker(data.inputImagePath, data.outputImagePath)
+        val imageWorker = ImageWorker(data.inputImagePath!!, data.outputImagePath!!)
 
         if (imageModifier == null)
             throw Error("Invalid action name!")
