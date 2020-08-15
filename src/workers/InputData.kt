@@ -2,11 +2,11 @@ package workers
 
 
 class InputData(private val input: Array<String>) {
-    val actionType: String? = getArgValue("-action")
-    val inputImagePath: String? = getArgValue("-in")
-    val outputImagePath: String? = getArgValue("-out")
-    val verticalSeamsToRemove: Int? = getArgValue("-width")?.toInt()
-    val horizontalSeamsToRemove: Int? = getArgValue("-height")?.toInt()
+    val actionType: String? = getArgValue(InputFlags.ACTION.flag)
+    val inputImagePath: String? = getArgValue(InputFlags.INPUT_FILE_PATH.flag)
+    val outputImagePath: String? = getArgValue(InputFlags.OUTPUT_FILE_PATH.flag)
+    val verticalSeamsToRemove: Int? = getArgValue(InputFlags.WIDTH_TO_REMOVE.flag)?.toInt()
+    val horizontalSeamsToRemove: Int? = getArgValue(InputFlags.HEIGHT_TO_REMOVE.flag)?.toInt()
 
     private fun getArgValue(arg: String): String? {
         for (i in input.indices) {
